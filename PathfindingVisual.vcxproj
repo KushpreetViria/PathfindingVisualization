@@ -92,6 +92,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Graphics\InputHandle\keyHandler.cpp" />
+    <ClCompile Include="src\Graphics\InputHandle\mouseHandler.cpp" />
     <ClCompile Include="src\Pre_Compiled\pch.cpp" />
     <ClCompile Include="src\Logic\Map.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
@@ -112,6 +114,8 @@
   <ItemGroup>
     <ClInclude Include="src\getDir.h" />
     <ClInclude Include="src\Graphics\Graphics.h" />
+    <ClInclude Include="src\Graphics\InputHandle\keyHandler.h" />
+    <ClInclude Include="src\Graphics\InputHandle\mouseHandler.h" />
     <ClInclude Include="src\Graphics\myException.h" />
     <ClInclude Include="src\Graphics\Square.h" />
     <ClInclude Include="src\Logic\Map.h" />

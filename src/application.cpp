@@ -6,7 +6,8 @@
 #include "Logic/Map.h"
 
 int main(int argc, char** argv) {
-	Graphics graphics = Graphics();
+	Map* newWorld = new Map(50, 50);
+	Graphics graphics = Graphics(newWorld);
 	if (!graphics.initialize()) {
 		std::cerr << "Error: Failed to initialize graphics. Exiting..." << std::endl;
 		return EXIT_FAILURE;
@@ -14,5 +15,6 @@ int main(int argc, char** argv) {
 	graphics.run();
 	//engine.setAlgo();
 	//engine.setMap();
+	delete newWorld;
 	return EXIT_SUCCESS;
 }

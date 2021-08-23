@@ -4,9 +4,12 @@
 #include <iostream>
 
 #include "Shader.h"
-#include "../Logic/Node.h"
 #include "../getDir.h"
 #include "Square.h"
+#include "InputHandle/mouseHandler.h"
+#include "InputHandle/keyHandler.h"
+
+#include "../Logic/Node.h"
 #include "../Logic/Map.h"
 
 class Graphics
@@ -15,7 +18,7 @@ public:
 	int windowWidth;
 	int windowHeight;
 
-	Graphics(int width = 800, int height = 800);
+	Graphics(Map* map,int width = 800, int height = 800);
 	
 	bool initialize();
 	void run();
@@ -26,14 +29,14 @@ private:
 	Map* worldMap;
 	Shader* myShader;
 
+	MouseHandler mouseHandle;
+	KeyHandler keyHandle;
+
 	GLuint VAO = 0;
 	GLuint VBO = 0;
 
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
-
-	float mouseX = -1;
-	float mouseY = -1;
 
 
 
@@ -45,9 +48,6 @@ private:
 	Node* getNodeUnderMouse();
 
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-	void mouse_pos_callback(GLFWwindow* window, double xpos, double ypos);
-	void key_press_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-	void mouse_btn_press_callback(GLFWwindow* window, int button, int action, int mods);
 	void SetCallbackFunctions();
 
 	class CallbackWrapper{
@@ -61,9 +61,14 @@ private:
 		static void MousePositionCallback(GLFWwindow* window,double positionX, double positionY);
 		static void KeyboardPressCallback(GLFWwindow* window,int key, int scancode, int action, int mods);
 		static void MouseBtnCallback(GLFWwindow* window, int button, int action, int mods);
-		static void SetEngine(Graphics* engine);
+		
+		static void SetGraphics(Graphics* graphics);
+		static void SetMouseHandler(MouseHandler* mh);
+		static void SetKeyHandler(KeyHandler* kh);
 	private:
-		static Graphics* engine;
+		static Graphics* graphics;
+		static MouseHandler* mouseHandle;
+		static KeyHandler* keyHandle;
 	};
 };
 

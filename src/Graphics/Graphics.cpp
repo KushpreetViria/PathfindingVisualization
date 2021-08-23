@@ -7,10 +7,9 @@
 constexpr auto vertShaderPath = "\\Shaders\\vertShader.glsl";
 constexpr auto fragShaderPath = "\\Shaders\\fragShader.glsl";
 
-Graphics::Graphics(int width, int height) : windowWidth(width), windowHeight(height), 
-        window(nullptr),myShader(nullptr){
-    worldMap = new Map();
-    worldMap->printMap();
+Graphics::Graphics(Map* map, int width, int height) : windowWidth(width), windowHeight(height),
+    worldMap(map),window(nullptr),myShader(nullptr), mouseHandle(MouseHandler()),keyHandle(KeyHandler()){
+    //worldMap->printMap();    
 }
 
 bool Graphics::initialize() {
@@ -65,7 +64,7 @@ void Graphics::run() {
         drawGrid();
 
         Node* mouseNode = getNodeUnderMouse();
-        if(mouseNode != nullptr) mouseNode->setType(nodeType::VISITED);
+        if(mouseNode != nullptr && mouseHandle.singleClickkHold && !mouseHandle.doubleClickHold) mouseNode->setType(nodeType::WALL);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -100,7 +99,9 @@ bool Graphics::createWindow() {
 }
 
 void Graphics::SetCallbackFunctions(){
-    CallbackWrapper::SetEngine(this);
+    CallbackWrapper::SetGraphics(this);
+    CallbackWrapper::SetMouseHandler(&mouseHandle);
+    //CallbackWrapper::
 
     glfwSetFramebufferSizeCallback(window, CallbackWrapper::FramebufferSizeCallback);
     glfwSetCursorPosCallback(window, CallbackWrapper::MousePositionCallback);
@@ -142,12 +143,12 @@ void Graphics::drawNode(float posX, float posY, float tileSizeX, float tileSizeY
     glm::mat4 projection = glm::ortho(-1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f);
     myShader->setMat4("projection", projection);
 
-    model = glm::translate(model, glm::vec3(tileSizeX / 2, tileSizeY / 2, 0.0f));   //this draws it in first quadrant (not around origin)
-    model = glm::translate(model, glm::vec3(posX, posY, 0.0f));                     //translate it to the position
-    model = glm::scale(model, glm::vec3(tileSizeX / 2, tileSizeY / 2, 1.0f));       //Scale by the calculated size
-    myShader->setMat4("model", model);
-    myShader->setVec3f("myColor", glm::vec3(0.0f, 0.0f, 0.0f));                     //color it black
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    //model = glm::translate(model, glm::vec3(tileSizeX / 2, tileSizeY / 2, 0.0f));   //this draws it in first quadrant (not around origin)
+    //model = glm::translate(model, glm::vec3(posX, posY, 0.0f));                     //translate it to the position
+    //model = glm::scale(model, glm::vec3(tileSizeX / 2, tileSizeY / 2, 1.0f));       //Scale by the calculated size
+    //myShader->setMat4("model", model);
+    //myShader->setVec3f("myColor", glm::vec3(0.0f, 0.0f, 0.0f));                     //color it black
+    //glDrawArrays(GL_TRIANGLES, 0, 6);
 
     //draw a slightly smaller colored box over it, and fill it 95% over the black one but leave some outline
     model = glm::mat4(1.0f);
@@ -184,7 +185,7 @@ void Graphics::drawNode(float posX, float posY, float tileSizeX, float tileSizeY
 }
 
 Node* Graphics::getNodeUnderMouse(){
-    if (mouseX < 0 || mouseY < 0) return nullptr;
+    if (mouseHandle.mouseX < 0 || mouseHandle.mouseY < 0) return nullptr;
 
     int win_width, win_height;
     glfwGetWindowSize(window, &win_width, &win_height);
@@ -192,8 +193,8 @@ Node* Graphics::getNodeUnderMouse(){
     int nodePixelWidth = win_width / worldMap->getWidth();
     int nodePixelHeight = win_height / worldMap->getHeight();
 
-    int nodeX = int(floor(mouseX / nodePixelWidth));
-    int nodeY = int(floor(mouseY / nodePixelHeight));
+    int nodeX = int(floor(mouseHandle.mouseX / nodePixelWidth));
+    int nodeY = int(floor(mouseHandle.mouseY / nodePixelHeight));
 
     Node* curr = &worldMap->getNodes()[nodeY][nodeX];
 
@@ -201,57 +202,45 @@ Node* Graphics::getNodeUnderMouse(){
 }
 
 //---------------------------------------------------------------------
-//                     Define callback functions
+//                     Define graphics callback functions
 //---------------------------------------------------------------------
 void Graphics::framebuffer_size_callback(GLFWwindow* window, int width, int height){
     glViewport(0, 0, width, height);
-}
-void Graphics::mouse_pos_callback(GLFWwindow* window, double xpos, double ypos)
-{
-    this->mouseX = (float)xpos;
-    this->mouseY = (float)ypos;
-    std::cout << "X: " << xpos << ", Y:" << ypos << std::endl;
-}
-void Graphics::key_press_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-    if (action == GLFW_PRESS) {
-        if(key == GLFW_KEY_ESCAPE)
-            glfwSetWindowShouldClose(window, true);
-    }
-}
-
-void Graphics::mouse_btn_press_callback(GLFWwindow* window, int button, int action, int mods)
-{
-    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS);
-    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE);
 }
 
 //---------------------------------------------------------------------
 //                    Set up callback wrapper
 //---------------------------------------------------------------------
-Graphics* Graphics::CallbackWrapper::engine = nullptr;
-
+Graphics* Graphics::CallbackWrapper::graphics = nullptr;
+MouseHandler* Graphics::CallbackWrapper::mouseHandle = nullptr;
+KeyHandler* Graphics::CallbackWrapper::keyHandle = nullptr;
 
 void Graphics::CallbackWrapper::FramebufferSizeCallback(GLFWwindow* window, int width, int height){
-    engine->framebuffer_size_callback(window, width, height);
+    graphics->framebuffer_size_callback(window, width, height);
 }
 void Graphics::CallbackWrapper::MousePositionCallback(GLFWwindow* window, double positionX, double positionY){
-    engine->mouse_pos_callback(window, positionX, positionY);
+    mouseHandle->mouse_pos_callback(window, positionX, positionY);
 }
 void Graphics::CallbackWrapper::KeyboardPressCallback(GLFWwindow* window, int key, int scancode, int action, int mods){
-    engine->key_press_callback(window, key, scancode, action, mods);
+    keyHandle->key_press_callback(window, key, scancode, action, mods);
 }
 void Graphics::CallbackWrapper::MouseBtnCallback(GLFWwindow* window, int button, int action, int mods){
-    engine->mouse_btn_press_callback(window, button, action, mods);
+    mouseHandle->mouse_btn_press_callback(window, button, action, mods);
 }
 
-void Graphics::CallbackWrapper::SetEngine(Graphics* engine){
-    CallbackWrapper::engine = engine;
+// set the handlers
+void Graphics::CallbackWrapper::SetGraphics(Graphics* graphics) {
+    CallbackWrapper::graphics = graphics;
+}
+void Graphics::CallbackWrapper::SetMouseHandler(MouseHandler* mh){
+    CallbackWrapper::mouseHandle = mh;
+}
+void Graphics::CallbackWrapper::SetKeyHandler(KeyHandler* kh) {
+    CallbackWrapper::keyHandle = kh;
 }
 
 Graphics::~Graphics()
 {
-    delete worldMap;
     delete myShader;
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
