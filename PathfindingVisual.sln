@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30225.117
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PathfindingVisual", "PathfindingVisual.vcxproj", "{093B5FB6-F4A0-4AFA-BFCF-31F8F8B4AED6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{093B5FB6-F4A0-4AFA-BFCF-31F8F8B4AED6}.Debug|x64.ActiveCfg = Debug|x64
+		{093B5FB6-F4A0-4AFA-BFCF-31F8F8B4AED6}.Debug|x64.Build.0 = Debug|x64
+		{093B5FB6-F4A0-4AFA-BFCF-31F8F8B4AED6}.Release|x64.ActiveCfg = Release|x64
+		{093B5FB6-F4A0-4AFA-BFCF-31F8F8B4AED6}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {79A056B9-07F3-48C5-A9E9-EAC24BC0FA0B}
+	EndGlobalSection
+EndGlobal
