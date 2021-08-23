@@ -340,14 +340,4 @@ ASALocalRun/
 healthchecksdb
 /Linking/include
 /Linking/lib
-/otherCode/vs.shader
-/otherCode/Text-Rendering.h
-/otherCode/Shapes.h
-/otherCode/Shader.h
-/otherCode/plan.txt
-/otherCode/Map.h
-/otherCode/HoverEffect.h
-/otherCode/GLInit.h
-/otherCode/fs.shader
-/otherCode/App.cpp
 /otherCode
