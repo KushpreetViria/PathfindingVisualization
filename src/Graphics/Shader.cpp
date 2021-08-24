@@ -96,6 +96,5 @@ void Shader::compileCheck(GLuint shader, std::string type) {
         std::string str = "ERROR::SHADER::";
         str.append(type).append("::COMPILATION_FAILED\n").append(infoLog).append("\n");
         std::cerr << "ERROR::SHADER::" << type << "COMPILATION_FAILED\n" << infoLog << std::endl;
-        throw MyException(str.c_str());
     };
 }

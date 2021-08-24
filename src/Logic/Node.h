@@ -14,6 +14,7 @@ enum class nodeType {
 
 class Node {
 public:
+	friend class Map;
 	// store type of node, wall, walkable, start, end
 	//other data?
 
@@ -41,9 +42,8 @@ public:
 		return this->neighbors;
 	}
 
-	bool operator ==(const Node& n) const {
-		return this->pos == n.pos;
-	}
+	bool operator ==(const Node& n) const { return this->pos == n.pos; }
+	bool operator !=(const Node& n) const { return this->pos != n.pos; }
 
 	~Node() {}
 

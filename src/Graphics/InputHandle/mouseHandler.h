@@ -11,9 +11,14 @@ class MouseHandler {
 public:
 	float mouseX;
 	float mouseY;
-	bool firstClick; 
-	bool singleClickkHold;
-	bool doubleClickHold;
+	
+	bool firstClickLeft;
+	bool firstClickRight;
+
+	bool singleClickkHoldLeft;
+	bool doubleClickHoldLeft;
+	bool singleClickkHoldRight;
+	bool doubleClickHoldRight;
 
 	MouseHandler();
 
@@ -23,5 +28,7 @@ private:
 	using my_time_point = std::chrono::steady_clock::time_point;
 	using high_res_clock = std::chrono::high_resolution_clock;
 	using duration = std::chrono::duration<double,std::milli>;
-	my_time_point lastClick;
+	
+	my_time_point lastClickLeft;
+	my_time_point lastClickRight;
 };

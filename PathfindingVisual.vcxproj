@@ -116,8 +116,6 @@
     <ClInclude Include="src\Graphics\Graphics.h" />
     <ClInclude Include="src\Graphics\InputHandle\keyHandler.h" />
     <ClInclude Include="src\Graphics\InputHandle\mouseHandler.h" />
-    <ClInclude Include="src\Graphics\myException.h" />
-    <ClInclude Include="src\Graphics\Square.h" />
     <ClInclude Include="src\Logic\Map.h" />
     <ClInclude Include="src\Logic\Node.h" />
     <ClInclude Include="src\Logic\Point.h" />

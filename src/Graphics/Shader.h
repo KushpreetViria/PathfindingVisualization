@@ -10,7 +10,6 @@
 #include <iostream>
 
 #include "../getDir.h"
-#include "myException.h"
 
 class Shader{
 	public:

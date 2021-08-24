@@ -20,6 +20,8 @@ Map::Map()
 {
 	this->width = DEFAULT_WIDTH;
 	this->height = DEFAULT_HEIGHT;
+	currStartNode = nullptr;
+	currEndNode = nullptr;
 
 	myNodes = new Node*[height];
 	for (int i = 0; i < height; i++) {
@@ -40,9 +42,11 @@ Map::Map()
 				break;
 			case 'S':
 				currNode->setType(nodeType::START);
+				currStartNode = currNode;
 				break;
 			case 'E':
 				currNode->setType(nodeType::END);
+				currEndNode = currNode;
 				break;
 			}
 		}
@@ -53,6 +57,8 @@ Map::Map(int width, int height)
 {
 	this->width = width;
 	this->height = height;
+	currStartNode = nullptr;
+	currEndNode = nullptr;
 
 	myNodes = new Node*[height];
 	for (int i = 0; i < height; i++) {
@@ -107,6 +113,22 @@ int Map::getHeight() const {
 
 Node** Map::getNodes() {
 	return myNodes;
+}
+
+void Map::updateStartNode(Node* node)
+{
+	if (node != nullptr && node->getType() == nodeType::START) {
+		if(currStartNode != nullptr && *node != *currStartNode) currStartNode->setType(nodeType::WALKABLE);
+		this->currStartNode = node;
+	}
+}
+
+void Map::updateEndNode(Node* node)
+{
+	if (node != nullptr && node->getType() == nodeType::END) {
+		if (currEndNode!= nullptr && *node != *currEndNode) currEndNode->setType(nodeType::WALKABLE);
+		this->currEndNode = node;
+	}
 }
 
 Map::~Map()

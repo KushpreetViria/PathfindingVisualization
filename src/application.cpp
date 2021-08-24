@@ -6,7 +6,7 @@
 #include "Logic/Map.h"
 
 int main(int argc, char** argv) {
-	Map* newWorld = new Map(50, 50);
+	Map* newWorld = new Map(25, 25);
 	Graphics graphics = Graphics(newWorld);
 	if (!graphics.initialize()) {
 		std::cerr << "Error: Failed to initialize graphics. Exiting..." << std::endl;

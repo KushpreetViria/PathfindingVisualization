@@ -50,9 +50,9 @@ void Graphics::run() {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        //process input
+        handleInputs();
 
-        glClearColor(0.9f, 0.7f, 0.8f, 1.0f);
+        glClearColor(0.0f,0.0f,0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         myShader->use();
@@ -61,10 +61,7 @@ void Graphics::run() {
         glLoadIdentity();
 
         glBindVertexArray(VAO);
-        drawGrid();
-
-        Node* mouseNode = getNodeUnderMouse();
-        if(mouseNode != nullptr && mouseHandle.singleClickkHold && !mouseHandle.doubleClickHold) mouseNode->setType(nodeType::WALL);
+        drawGrid();        
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -98,6 +95,32 @@ bool Graphics::createWindow() {
     return true;
 }
 
+void Graphics::handleInputs()
+{    
+    Node* theNode = getNodeUnderMouse();
+    if (mouseHandle.doubleClickHoldLeft) {
+        theNode->setType(nodeType::WALKABLE);
+    }else if (mouseHandle.singleClickkHoldLeft) {
+        theNode->setType(nodeType::WALL);
+    }else if (mouseHandle.doubleClickHoldRight) {
+        theNode->setType(nodeType::END);
+        worldMap->updateEndNode(theNode);
+    }else if (mouseHandle.singleClickkHoldRight) {
+        theNode->setType(nodeType::START);
+        worldMap->updateStartNode(theNode);
+    }
+
+    if (keyHandle.quit) {
+        glfwSetWindowShouldClose(window, true);
+    }else if (keyHandle.start) {
+        keyHandle.start = false;
+        //todo: start map with algorithm
+    }else if (keyHandle.reset) {
+        keyHandle.reset = false;
+        //todo: reset map
+    }
+}
+
 void Graphics::SetCallbackFunctions(){
     CallbackWrapper::SetGraphics(this);
     CallbackWrapper::SetMouseHandler(&mouseHandle);
@@ -123,8 +146,13 @@ void Graphics::drawGrid()
     float tileSizeW = (2.0f / (float)mapW);
     float tileSizeH = (2.0f / (float)mapH);
 
+    glm::mat4 model = glm::mat4(1.0f);
+    //dont need these, just set them to identity once
+    myShader->setMat4("view", model);
+    myShader->setMat4("projection", model);
+
     for (int row = 0; row < mapH; row++) {
-        float vpPosY = (float)row * tileSizeH - 1.0f;               //map its row in the 2d grid array to [-1,1] viewport coords
+        float vpPosY = (float)row * -tileSizeH + 1.0f;               //map its row in the 2d grid array to [-1,1] y viewport coords (flipped)
         for (int col = 0; col < mapW; col++) {
             Node* curr = &grid[row][col];
             
@@ -138,27 +166,14 @@ void Graphics::drawGrid()
 void Graphics::drawNode(float posX, float posY, float tileSizeX, float tileSizeY, Node* currNode)
 {
     //draw a black box first, this is will look like an outline when the smaller box covers it
-    glm::mat4 model = glm::mat4(1.0f);
-    myShader->setMat4("view", model);
-    glm::mat4 projection = glm::ortho(-1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f);
-    myShader->setMat4("projection", projection);
+    glm::mat4 model = glm::mat4(1.0f);    
 
-    //model = glm::translate(model, glm::vec3(tileSizeX / 2, tileSizeY / 2, 0.0f));   //this draws it in first quadrant (not around origin)
-    //model = glm::translate(model, glm::vec3(posX, posY, 0.0f));                     //translate it to the position
-    //model = glm::scale(model, glm::vec3(tileSizeX / 2, tileSizeY / 2, 1.0f));       //Scale by the calculated size
-    //myShader->setMat4("model", model);
-    //myShader->setVec3f("myColor", glm::vec3(0.0f, 0.0f, 0.0f));                     //color it black
-    //glDrawArrays(GL_TRIANGLES, 0, 6);
+    //save these to avoid expensive divisions
+    float halfTileX = tileSizeX / 2;
+    float halfTileY = tileSizeY / 2;
 
-    //draw a slightly smaller colored box over it, and fill it 95% over the black one but leave some outline
-    model = glm::mat4(1.0f);
-    myShader->setMat4("view", model);
-    myShader->setMat4("projection", projection);
-
-    model = glm::translate(model, glm::vec3(tileSizeX / 2, tileSizeY / 2, 0.0f));
-    model = glm::translate(model, glm::vec3(posX, posY, 0.0f));
-    model = glm::scale(model, glm::vec3(0.95f, 0.95f, 1.0f));                        // do another scale, make it 5% smaller, this will show the black outline
-    model = glm::scale(model, glm::vec3(tileSizeX / 2, tileSizeY / 2, 1.0f));
+    model = glm::translate(model, glm::vec3(posX + (halfTileX), posY-(halfTileY), 0.0f)); // do another scale, make it 5% smaller, this will show the black outline
+    model = glm::scale(model, glm::vec3(0.95f* (halfTileX), 0.95f* (halfTileY), 1.0f));
     myShader->setMat4("model", model);
 
     //color the node based on its type
@@ -193,10 +208,12 @@ Node* Graphics::getNodeUnderMouse(){
     int nodePixelWidth = win_width / worldMap->getWidth();
     int nodePixelHeight = win_height / worldMap->getHeight();
 
-    int nodeX = int(floor(mouseHandle.mouseX / nodePixelWidth));
-    int nodeY = int(floor(mouseHandle.mouseY / nodePixelHeight));
+    //note: for large grid sizes (over million nodes), theres some index out bounds errors
+    //when using int, so just use size_t. Its too slow on a million+ nodes to do anything anyways
+    size_t colIndex = size_t(floor(mouseHandle.mouseX / nodePixelWidth));
+    size_t rowIndex = size_t(floor(mouseHandle.mouseY / nodePixelHeight));
 
-    Node* curr = &worldMap->getNodes()[nodeY][nodeX];
+    Node* curr = &worldMap->getNodes()[rowIndex][colIndex];
 
     return curr;
 }

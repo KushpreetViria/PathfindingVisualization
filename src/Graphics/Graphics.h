@@ -5,12 +5,20 @@
 
 #include "Shader.h"
 #include "../getDir.h"
-#include "Square.h"
 #include "InputHandle/mouseHandler.h"
 #include "InputHandle/keyHandler.h"
 
 #include "../Logic/Node.h"
 #include "../Logic/Map.h"
+
+const float squareVertices[] = {
+		   -1.0f, -1.0f,
+			1.0f, -1.0f,
+			1.0f,  1.0f,
+			1.0f,  1.0f,
+		   -1.0f,  1.0f,
+		   -1.0f, -1.0f,
+};
 
 class Graphics
 {
@@ -38,10 +46,9 @@ private:
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
 
+	bool createWindow();
+	void handleInputs();
 
-
-
-	bool createWindow();	
 
 	void drawGrid();
 	void drawNode(float posX, float posY, float tileSizeX, float tileSizeY, Node* curr);
