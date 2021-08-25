@@ -42,6 +42,9 @@
     <ClCompile Include="src\Graphics\InputHandle\mouseHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Logic\Search_Algorithm\Recursive_Search.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Pre_Compiled\pch.h">
@@ -69,6 +72,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Graphics\InputHandle\keyHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Logic\Search_Algorithm\SearchAlgorithm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Logic\Search_Algorithm\A_Search.cpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

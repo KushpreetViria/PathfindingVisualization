@@ -14,12 +14,11 @@ enum class nodeType {
 
 class Node {
 public:
-	friend class Map;
 	// store type of node, wall, walkable, start, end
 	//other data?
 
 	Node(int x = 0, int y = 0) :pos(Point(x, y)),type(nodeType::WALKABLE) {
-		neighbors.reserve(8); //could have at most 8
+		neighbors.reserve(4); //could have at most 8
 	}
 
 	void addNeighbor(int x, int y) {

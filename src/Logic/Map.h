@@ -17,9 +17,12 @@ private:
 public:
 	Map(); //default
 	Map(int width, int height); //custom
+	void reset(bool hard);
 
 	int getWidth() const;
 	int getHeight() const;
+	Node* getStart();
+	Node* getEnd();
 	Node** getNodes();
 
 	void updateStartNode(Node* node);
@@ -27,7 +30,5 @@ public:
 
 	void printMap();
 	~Map();
-
-
 };
 
