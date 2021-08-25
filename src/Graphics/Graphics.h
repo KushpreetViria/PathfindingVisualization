@@ -37,6 +37,7 @@ private:
 	GLFWwindow* window;
 	Map* worldMap;
 	Shader* myShader;
+	SearchAlgorithm search;
 
 	MouseHandler mouseHandle;
 	KeyHandler keyHandle;
@@ -48,7 +49,8 @@ private:
 	float lastFrame = 0.0f;
 
 	bool createWindow();
-	void handleInputs();
+	void handleSoftInputs(); //can be blocked
+	void handleHardInputs(); //aren't blocked, checked each frame
 
 
 	void drawGrid();

@@ -6,7 +6,7 @@
 #include "Logic/Map.h"
 
 int main(int argc, char** argv) {
-	Map* newWorld = new Map(25, 25);
+	Map* newWorld = new Map(50, 50);
 	//Map* newWorld = new Map();
 	Graphics graphics = Graphics(newWorld);
 	if (!graphics.initialize()) {

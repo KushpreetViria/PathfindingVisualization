@@ -8,7 +8,8 @@ constexpr auto vertShaderPath = "\\Shaders\\vertShader.glsl";
 constexpr auto fragShaderPath = "\\Shaders\\fragShader.glsl";
 
 Graphics::Graphics(Map* map, int width, int height) : windowWidth(width), windowHeight(height),
-    worldMap(map),window(nullptr),myShader(nullptr), mouseHandle(MouseHandler()),keyHandle(KeyHandler()){
+    worldMap(map),window(nullptr),myShader(nullptr), mouseHandle(MouseHandler()),keyHandle(KeyHandler()),
+    search(SearchAlgorithm(map)){
 }
 
 bool Graphics::initialize() {
@@ -44,6 +45,7 @@ void Graphics::run() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(squareVertices), squareVertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);    
+    int speed = 10;
 
     while (!glfwWindowShouldClose(window)) {
 
@@ -51,7 +53,16 @@ void Graphics::run() {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        handleInputs();
+        handleHardInputs(); //always check these
+        if(search.hasSearchStarted()){
+            for (int i = 0; i < speed; i++) {
+                if (search.searchNotFinished()) {
+                    search.updateNextStep();
+                }
+            }
+        }else {
+            handleSoftInputs(); //these are blocked while a search is happening
+        }
 
         glClearColor(0.0f,0.0f,0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -92,7 +103,8 @@ bool Graphics::createWindow() {
     return true;
 }
 
-void Graphics::handleInputs()
+//inputs that can be blocked
+void Graphics::handleSoftInputs()
 {    
     Node* theNode = getNodeUnderMouse();
     if(theNode != nullptr){
@@ -109,15 +121,21 @@ void Graphics::handleInputs()
         }
     }
 
-    if (keyHandle.quit) {
-        glfwSetWindowShouldClose(window, true);
-    }else if (keyHandle.start) {
+    if (keyHandle.start) {
         worldMap->reset(false);
         keyHandle.start = false;
-        bool result = SearchAlgorithm::simple_recursive_search(worldMap);        
-        if(result) std::cout << "FOUND!" << std::endl;
-        else std::cout << "FAIL!" << std::endl;
-    }else if (keyHandle.reset) {
+        search.changeAlgorithm(algorithms::ITERATIVE);
+        search.setupSearch();
+    }
+}
+
+//these inputs are checked each frame, aren't blocked
+void Graphics::handleHardInputs() 
+{
+    if (keyHandle.quit) {
+        glfwSetWindowShouldClose(window, true);
+    }else if(keyHandle.reset) {
+        search.resetSearch();
         keyHandle.reset = false;
         worldMap->reset(true);
     }

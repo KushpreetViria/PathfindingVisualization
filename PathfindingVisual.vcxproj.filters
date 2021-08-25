@@ -42,7 +42,7 @@
     <ClCompile Include="src\Graphics\InputHandle\mouseHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Logic\Search_Algorithm\Recursive_Search.cpp">
+    <ClCompile Include="src\Logic\Search_Algorithm\IterativeSearch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -77,7 +77,10 @@
     <ClInclude Include="src\Logic\Search_Algorithm\SearchAlgorithm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Logic\Search_Algorithm\A_Search.cpp">
+    <ClInclude Include="src\Logic\Search_Algorithm\Search.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Logic\Search_Algorithm\IterativeSearch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
