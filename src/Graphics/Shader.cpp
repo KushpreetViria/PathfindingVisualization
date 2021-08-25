@@ -59,7 +59,7 @@ Shader::Shader(const char* vertexPath, const char* fragPath) {
     // delete the shaders as they're linked into our program now and no longer necessary
     glDeleteShader(vertex);
     glDeleteShader(fragment);
-    std::cout << "Finished shader" << std::endl;
+    std::cout << "Compiled shaders Successfully" << std::endl;
 }
 
 void Shader::use(){

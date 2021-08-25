@@ -9,7 +9,6 @@ constexpr auto fragShaderPath = "\\Shaders\\fragShader.glsl";
 
 Graphics::Graphics(Map* map, int width, int height) : windowWidth(width), windowHeight(height),
     worldMap(map),window(nullptr),myShader(nullptr), mouseHandle(MouseHandler()),keyHandle(KeyHandler()){
-    //worldMap->printMap();    
 }
 
 bool Graphics::initialize() {
@@ -30,6 +29,8 @@ bool Graphics::initialize() {
 
     myShader = new Shader(vertShaderPath, fragShaderPath);
 
+    std::cout << "Initialized graphics Successfuly" << std::endl;
+
     return true;
 }
 
@@ -44,7 +45,7 @@ void Graphics::run() {
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);    
 
-    while (!glfwWindowShouldClose(window)) {        
+    while (!glfwWindowShouldClose(window)) {
 
         float currentFrame = (float)glfwGetTime();
         deltaTime = currentFrame - lastFrame;
@@ -56,10 +57,6 @@ void Graphics::run() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         myShader->use();
-        
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-
         glBindVertexArray(VAO);
         drawGrid();        
 
@@ -98,33 +95,38 @@ bool Graphics::createWindow() {
 void Graphics::handleInputs()
 {    
     Node* theNode = getNodeUnderMouse();
-    if (mouseHandle.doubleClickHoldLeft) {
-        theNode->setType(nodeType::WALKABLE);
-    }else if (mouseHandle.singleClickkHoldLeft) {
-        theNode->setType(nodeType::WALL);
-    }else if (mouseHandle.doubleClickHoldRight) {
-        theNode->setType(nodeType::END);
-        worldMap->updateEndNode(theNode);
-    }else if (mouseHandle.singleClickkHoldRight) {
-        theNode->setType(nodeType::START);
-        worldMap->updateStartNode(theNode);
+    if(theNode != nullptr){
+        if (mouseHandle.doubleClickHoldLeft) {
+            theNode->setType(nodeType::WALKABLE);
+        }else if (mouseHandle.singleClickkHoldLeft) {
+            theNode->setType(nodeType::WALL);
+        }else if (mouseHandle.doubleClickHoldRight) {
+            theNode->setType(nodeType::END);
+            worldMap->updateEndNode(theNode);
+        }else if (mouseHandle.singleClickkHoldRight) {
+            theNode->setType(nodeType::START);
+            worldMap->updateStartNode(theNode);
+        }
     }
 
     if (keyHandle.quit) {
         glfwSetWindowShouldClose(window, true);
     }else if (keyHandle.start) {
+        worldMap->reset(false);
         keyHandle.start = false;
-        //todo: start map with algorithm
+        bool result = SearchAlgorithm::simple_recursive_search(worldMap);        
+        if(result) std::cout << "FOUND!" << std::endl;
+        else std::cout << "FAIL!" << std::endl;
     }else if (keyHandle.reset) {
         keyHandle.reset = false;
-        //todo: reset map
+        worldMap->reset(true);
     }
 }
 
 void Graphics::SetCallbackFunctions(){
     CallbackWrapper::SetGraphics(this);
     CallbackWrapper::SetMouseHandler(&mouseHandle);
-    //CallbackWrapper::
+    CallbackWrapper::SetKeyHandler(&keyHandle);
 
     glfwSetFramebufferSizeCallback(window, CallbackWrapper::FramebufferSizeCallback);
     glfwSetCursorPosCallback(window, CallbackWrapper::MousePositionCallback);
@@ -200,10 +202,12 @@ void Graphics::drawNode(float posX, float posY, float tileSizeX, float tileSizeY
 }
 
 Node* Graphics::getNodeUnderMouse(){
-    if (mouseHandle.mouseX < 0 || mouseHandle.mouseY < 0) return nullptr;
-
     int win_width, win_height;
     glfwGetWindowSize(window, &win_width, &win_height);
+
+    if (!glfwGetWindowAttrib(window, GLFW_HOVERED) ||
+        mouseHandle.mouseX < 0 || mouseHandle.mouseY < 0)
+        return nullptr;
 
     int nodePixelWidth = win_width / worldMap->getWidth();
     int nodePixelHeight = win_height / worldMap->getHeight();

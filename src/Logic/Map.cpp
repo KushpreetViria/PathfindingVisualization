@@ -3,6 +3,7 @@
 
 constexpr auto DEFAULT_WIDTH = 10;
 constexpr auto DEFAULT_HEIGHT = 10;
+
 char defaultMap[DEFAULT_WIDTH][DEFAULT_HEIGHT] = {
 	{ 'X','X','X','X','X','X','X','X','X','X' },
 	{ 'X','O','E','X','O','O','X','S','O','X' },
@@ -73,17 +74,30 @@ Map::Map(int width, int height)
 	}
 }
 
+void Map::reset(bool hard)
+{
+	for (int r = 0; r < height; r++) {
+		for (int c = 0; c < width; c++) {
+			Node* currNode = &myNodes[r][c];
+			nodeType type = currNode->getType();
+			if (type == nodeType::VISITED || (hard && type == nodeType::WALL)) {
+				currNode->setType(nodeType::WALKABLE);
+			}
+		}
+	}
+}
+
 void Map::addNeighbors(unsigned int row, unsigned int col) {
 	Node* currNode = &myNodes[row][col];
 	
 	if (inRange(row + 0, col + 1)) currNode->addNeighbor(row ,col + 1);
 	if (inRange(row + 0, col - 1)) currNode->addNeighbor(row ,col - 1);
-	if (inRange(row + 1, col + 1)) currNode->addNeighbor(row + 1, col);
-	if (inRange(row - 1, col + 1)) currNode->addNeighbor(row - 1, col);
-	if (inRange(row + 1, col + 1)) currNode->addNeighbor(row + 1,col + 1);
-	if (inRange(row - 1, col - 1)) currNode->addNeighbor(row - 1,col - 1);
-	if (inRange(row - 1, col + 1)) currNode->addNeighbor(row - 1,col + 1);
-	if (inRange(row + 1, col - 1)) currNode->addNeighbor(row + 1,col - 1);
+	if (inRange(row + 1, col + 0)) currNode->addNeighbor(row + 1, col);
+	if (inRange(row - 1, col + 0)) currNode->addNeighbor(row - 1, col);
+	//if (inRange(row + 1, col + 1)) currNode->addNeighbor(row + 1,col + 1);
+	//if (inRange(row - 1, col - 1)) currNode->addNeighbor(row - 1,col - 1);
+	//if (inRange(row - 1, col + 1)) currNode->addNeighbor(row - 1,col + 1);
+	//if (inRange(row + 1, col - 1)) currNode->addNeighbor(row + 1,col - 1);
 }
 
 bool Map::inRange(int row, int col) {
@@ -109,6 +123,16 @@ int Map::getWidth() const {
 
 int Map::getHeight() const {
 	return height;
+}
+
+Node* Map::getStart()
+{
+	return currStartNode;
+}
+
+Node* Map::getEnd()
+{
+	return currEndNode;
 }
 
 Node** Map::getNodes() {

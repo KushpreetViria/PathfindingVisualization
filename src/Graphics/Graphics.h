@@ -10,6 +10,7 @@
 
 #include "../Logic/Node.h"
 #include "../Logic/Map.h"
+#include "../Logic/Search_Algorithm/SearchAlgorithm.h"
 
 const float squareVertices[] = {
 		   -1.0f, -1.0f,
