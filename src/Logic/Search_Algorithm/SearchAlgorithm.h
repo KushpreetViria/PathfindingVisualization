@@ -3,8 +3,10 @@
 #include <stack>
 #include "../Map.h"
 #include "../Node.h"
+
 #include "Search.h"
 #include "IterativeSearch.h"
+#include "ASearch.h"
 
 enum class algorithms {
 	ITERATIVE,
@@ -32,6 +34,7 @@ public:
 				search = new IterativeSearch(myMap);
 				break;
 			case algorithms::A_STAR:
+				search = new ASearch(myMap);
 				break;
 			case algorithms::DJIKSTRA:
 				break;
@@ -47,8 +50,15 @@ public:
 	};
 
 	bool searchNotFinished() {
-		bool result = search->isFinished();
+		bool result = search->isNotFinished();
 		if (!result) {
+			if (search->foundEnd) {
+				std::cout << "found destination" << std::endl;
+			}
+			else {
+				std::cout << "FAILED to find destination" << std::endl;
+			}
+
 			search->reset();
 			Started = false;
 		}

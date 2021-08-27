@@ -26,6 +26,7 @@ class Graphics
 public:
 	int windowWidth;
 	int windowHeight;
+	float addionalSpeed = 0;
 
 	Graphics(Map* map,int width = 800, int height = 800);
 	
@@ -45,20 +46,28 @@ private:
 	GLuint VAO = 0;
 	GLuint VBO = 0;
 
-	float deltaTime = 0.0f;
-	float lastFrame = 0.0f;
+	double deltaTime = 0.0f;
+	double lastFrame = 0.0f;
 
-	bool createWindow();
-	void handleSoftInputs(); //can be blocked
-	void handleHardInputs(); //aren't blocked, checked each frame
+	int FPS = 0;
+	double lastFPSTime = 0.0f;
+	double currentFPSTime = 0.0f;
 
+	//--------functions/methods-------------------//
+
+	bool createWindow();	
+	void updateDeltaFrameTime();
+	void printFPS();
 
 	void drawGrid();
 	void drawNode(float posX, float posY, float tileSizeX, float tileSizeY, Node* curr);
+
+	void handleSoftInputs(); //can be blocked
+	void handleHardInputs(); //aren't blocked, checked each frame
 	Node* getNodeUnderMouse();
 
-	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 	void SetCallbackFunctions();
+	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 	class CallbackWrapper{
 	public:

@@ -7,7 +7,7 @@ public:
 	IterativeSearch(Map* map);
 	bool setup();
 	void nextNodeStep();
-	bool isFinished();
+	bool isNotFinished();
 	void reset();
 private:
 	std::stack<Node*, std::vector<Node*> > stack;

@@ -8,7 +8,7 @@ class Search {
 public:
 	virtual bool setup() = 0;
 	virtual void nextNodeStep() = 0;
-	virtual bool isFinished() = 0;
+	virtual bool isNotFinished() = 0;
 	virtual void reset() = 0;
 	virtual ~Search() {};
 

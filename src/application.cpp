@@ -6,6 +6,9 @@
 #include "Logic/Map.h"
 
 int main(int argc, char** argv) {
+
+	//to change the algorithm, set it in the start key handle in graphics.cpp
+
 	Map* newWorld = new Map(50, 50);
 	//Map* newWorld = new Map();
 	Graphics graphics = Graphics(newWorld);
@@ -14,8 +17,6 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 	graphics.run();
-	//engine.setAlgo();
-	//engine.setMap();
 	delete newWorld;
 	return EXIT_SUCCESS;
 }

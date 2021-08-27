@@ -14,15 +14,20 @@ enum class nodeType {
 
 class Node {
 public:
-	// store type of node, wall, walkable, start, end
-	//other data?
+	float f;
+	float g;
+	float h;
 
-	Node(int x = 0, int y = 0) :pos(Point(x, y)),type(nodeType::WALKABLE) {
-		neighbors.reserve(4); //could have at most 8
+	Node(int x = 0, int y = 0) :type(nodeType::WALKABLE) {
+		pos = Point(x, y);
+		neighbors.reserve(8); //could have at most 8
+		f = FLT_MAX;
+		g = FLT_MAX;
+		h = FLT_MAX;
 	}
 
 	void addNeighbor(int x, int y) {
-		neighbors.push_back(Point(x,y));
+		neighbors.push_back(Point(x, y));
 	}
 	void setPosition(int x, int y) {
 		this->pos = Point(x, y);
@@ -31,18 +36,23 @@ public:
 		this->type = nType;
 	}
 
-	Point getPos() const{
+	Point getPos() const {
 		return this->pos;
 	}
-	nodeType getType() const{
+	nodeType getType() const {
 		return this->type;
 	}
-	const std::vector<Point>& getNeighbors() const{
+
+	const std::vector<Point>& getNeighbors() const {
 		return this->neighbors;
 	}
 
 	bool operator ==(const Node& n) const { return this->pos == n.pos; }
 	bool operator !=(const Node& n) const { return this->pos != n.pos; }
+
+	bool operator <(const Node& n) const {
+		return (this->f < n.f) ? true : false;
+	}
 
 	~Node() {}
 

@@ -90,14 +90,14 @@ void Map::reset(bool hard)
 void Map::addNeighbors(unsigned int row, unsigned int col) {
 	Node* currNode = &myNodes[row][col];
 	
-	if (inRange(row + 0, col + 1)) currNode->addNeighbor(row ,col + 1);
-	if (inRange(row + 0, col - 1)) currNode->addNeighbor(row ,col - 1);
-	if (inRange(row + 1, col + 0)) currNode->addNeighbor(row + 1, col);
-	if (inRange(row - 1, col + 0)) currNode->addNeighbor(row - 1, col);
-	//if (inRange(row + 1, col + 1)) currNode->addNeighbor(row + 1,col + 1);
-	//if (inRange(row - 1, col - 1)) currNode->addNeighbor(row - 1,col - 1);
-	//if (inRange(row - 1, col + 1)) currNode->addNeighbor(row - 1,col + 1);
-	//if (inRange(row + 1, col - 1)) currNode->addNeighbor(row + 1,col - 1);
+	if (inRange(row - 1, col + 0)) currNode->addNeighbor(col, row - 1);
+	if (inRange(row + 0, col - 1)) currNode->addNeighbor(col - 1, row);
+	if (inRange(row + 1, col + 0)) currNode->addNeighbor(col, row + 1);
+	if (inRange(row + 0, col + 1)) currNode->addNeighbor(col + 1,row);		
+	if (inRange(row + 1, col + 1)) currNode->addNeighbor(col + 1, row + 1);
+	if (inRange(row - 1, col - 1)) currNode->addNeighbor(col - 1, row - 1);
+	if (inRange(row - 1, col + 1)) currNode->addNeighbor(col + 1, row - 1);
+	if (inRange(row + 1, col - 1)) currNode->addNeighbor(col - 1, row + 1);
 }
 
 bool Map::inRange(int row, int col) {

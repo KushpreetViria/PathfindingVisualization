@@ -1,6 +1,7 @@
 #include "Graphics.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <time.h>
+#include <windows.h>
 
 #define SCR_WIDTH glfwGetVideoMode(glfwGetPrimaryMonitor())->width;
 #define SCR_HEIGHT glfwGetVideoMode(glfwGetPrimaryMonitor())->width;
@@ -45,17 +46,19 @@ void Graphics::run() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(squareVertices), squareVertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);    
-    int speed = 10;
+    int avg = (worldMap->getWidth() + worldMap->getHeight()) / 2;
+    int speed = ((avg - 10) * (9) / (90)) + 1;
+    std::cout << "PATH DRAW SPEED: " << speed << std::endl;
 
     while (!glfwWindowShouldClose(window)) {
 
-        float currentFrame = (float)glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+        printFPS();             //print fps every second
+        updateDeltaFrameTime(); //time per frame
+        handleHardInputs();     //always check these inputs
 
-        handleHardInputs(); //always check these
         if(search.hasSearchStarted()){
-            for (int i = 0; i < speed; i++) {
+            int drawSpeed = speed + (int)addionalSpeed;
+            for (int i = 0; i < (int)(drawSpeed); i++) {
                 if (search.searchNotFinished()) {
                     search.updateNextStep();
                 }
@@ -103,19 +106,53 @@ bool Graphics::createWindow() {
     return true;
 }
 
-//inputs that can be blocked
+void Graphics::printFPS(){
+    currentFPSTime = glfwGetTime() + 0.001;
+    FPS += 1;
+    if (currentFPSTime - lastFPSTime >= 1.0f)
+    {
+        lastFPSTime = currentFPSTime;
+        std::cout << "FPS: " << FPS << std::endl;
+        FPS = 0;
+    }
+}
+
+void Graphics::updateDeltaFrameTime() {
+    double currentFrame = glfwGetTime();
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+}
+
+//---------------------------------------------------------------------
+//                      Handle the inputs
+//---------------------------------------------------------------------
+// inputs that can be blocked
 void Graphics::handleSoftInputs()
-{    
+{
     Node* theNode = getNodeUnderMouse();
-    if(theNode != nullptr){
+    if (theNode != nullptr) {
+        
         if (mouseHandle.doubleClickHoldLeft) {
-            theNode->setType(nodeType::WALKABLE);
-        }else if (mouseHandle.singleClickkHoldLeft) {
+            theNode->setType(nodeType::WALKABLE);                        
+        }
+
+        else if (mouseHandle.singleClickkHoldLeft) {
             theNode->setType(nodeType::WALL);
-        }else if (mouseHandle.doubleClickHoldRight) {
+            auto neighbors = theNode->getNeighbors();
+            for (auto it = std::begin(neighbors); it != std::end(neighbors); ++it) {
+                Node* neigh = &worldMap->getNodes()[it->y][it->x];
+                if (neigh->getType() != nodeType::WALL && neigh->getType() != nodeType::START && neigh->getType() != nodeType::END) {
+                    neigh->setType(nodeType::WALL);
+                    break;
+                }
+            }
+        }
+
+        else if (mouseHandle.doubleClickHoldRight) {
             theNode->setType(nodeType::END);
             worldMap->updateEndNode(theNode);
-        }else if (mouseHandle.singleClickkHoldRight) {
+        }
+        else if (mouseHandle.singleClickkHoldRight) {
             theNode->setType(nodeType::START);
             worldMap->updateStartNode(theNode);
         }
@@ -123,24 +160,31 @@ void Graphics::handleSoftInputs()
 
     if (keyHandle.start) {
         worldMap->reset(false);
-        keyHandle.start = false;
-        search.changeAlgorithm(algorithms::ITERATIVE);
+        //search.changeAlgorithm(algorithms::ITERATIVE);
+        search.changeAlgorithm(algorithms::A_STAR);
         search.setupSearch();
+        keyHandle.start = false;
     }
 }
 
-//these inputs are checked each frame, aren't blocked
+//cannot be blocked inputs
 void Graphics::handleHardInputs() 
 {
     if (keyHandle.quit) {
         glfwSetWindowShouldClose(window, true);
     }else if(keyHandle.reset) {
         search.resetSearch();
-        keyHandle.reset = false;
         worldMap->reset(true);
+    }else if (keyHandle.key_up) {
+        addionalSpeed += 0.2f;
+        std::cout << "Addional Draw speed: " <<addionalSpeed << std::endl;
+    }else if (keyHandle.key_down) {
+        addionalSpeed = max(addionalSpeed - 0.2f, 0.0f);
+        std::cout << "Addional Draw speed: " << addionalSpeed << std::endl;
     }
 }
 
+//setup callback functions to receive inputs on specific classes
 void Graphics::SetCallbackFunctions(){
     CallbackWrapper::SetGraphics(this);
     CallbackWrapper::SetMouseHandler(&mouseHandle);
