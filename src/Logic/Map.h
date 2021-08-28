@@ -9,6 +9,8 @@ private:
 	int width;
 	int height;
 
+	int pathSize = 0;
+
 	Node* currStartNode;
 	Node* currEndNode;
 

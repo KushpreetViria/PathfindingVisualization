@@ -45,9 +45,9 @@ void Dijkstra::nextNodeStep()
 				if (newDist < neighbor->dist) {											//if its a smaller path update neighbor
 					neighbor->parent = current;
 					neighbor->dist = newDist;
-				}
-				if (!exploredNodes.find(neighbor)) {									// add this unvisited neighbor to the queue if it's new
-					exploredNodes.push(neighbor);
+					if (!exploredNodes.find(neighbor)) {								// add this unvisited neighbor to the queue if it's new
+						exploredNodes.push(neighbor);
+					}
 				}			
 			}
 		}

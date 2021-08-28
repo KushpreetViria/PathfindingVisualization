@@ -108,13 +108,16 @@ void Map::reset(bool hard)
 
 //follow the parent nodes set to color the path from endnode to startnode
 void Map::colorPath() {
+	pathSize = 0;
 	colorParent(currEndNode);
+	std::cout << "Size of path: " << pathSize << std::endl;
 }
 
 void Map::colorParent(Node* curr) {
 	if (curr->getType() != nodeType::END && curr->getType() != nodeType::START) {
 		curr->setType(nodeType::PATH);
 	}
+	pathSize += 1;
 	if (curr->parent != nullptr) colorParent(curr->parent);
 }
 
