@@ -3,16 +3,18 @@
 #include <time.h>
 #include <windows.h>
 
-#define SCR_WIDTH glfwGetVideoMode(glfwGetPrimaryMonitor())->width;
-#define SCR_HEIGHT glfwGetVideoMode(glfwGetPrimaryMonitor())->width;
+#define SCR_WIDTH glfwGetVideoMode(glfwGetPrimaryMonitor())->width
+#define SCR_HEIGHT glfwGetVideoMode(glfwGetPrimaryMonitor())->height
 constexpr auto vertShaderPath = "\\Shaders\\vertShader.glsl";
 constexpr auto fragShaderPath = "\\Shaders\\fragShader.glsl";
 
 Graphics::Graphics(Map* map, int width, int height) : windowWidth(width), windowHeight(height),
     worldMap(map),window(nullptr),myShader(nullptr), mouseHandle(MouseHandler()),keyHandle(KeyHandler()),
     search(SearchAlgorithm(map)){
+    currSearchAlgo = 0;
 }
 
+//intialize glfw and glew, as well as compile the shader program
 bool Graphics::initialize() {
     if (!createWindow()) {
         std::cerr << "Error: failed to create glfw window" << std::endl;
@@ -36,8 +38,10 @@ bool Graphics::initialize() {
     return true;
 }
 
+//run the render loop until the window is closed
 void Graphics::run() {
-    //bind square shape vertices to a buffer object
+    
+    //bind square shape vertices to a buffer object in GPU memory
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
 
@@ -46,20 +50,25 @@ void Graphics::run() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(squareVertices), squareVertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);    
+
+    //calculate a draw speed for the path finding, bigger maps need a faster speed
     int avg = (worldMap->getWidth() + worldMap->getHeight()) / 2;
-    int speed = ((avg - 10) * (9) / (90)) + 1;
+    int speed = ((avg - 10) * (5) / (90)) + 1;
+    
     std::cout << "PATH DRAW SPEED: " << speed << std::endl;
+    std::cout << "Algorithm: " << algoArray[currSearchAlgo] << std::endl;
 
     while (!glfwWindowShouldClose(window)) {
 
-        printFPS();             //print fps every second
-        updateDeltaFrameTime(); //time per frame
+        // printFPS();             
+        updateDeltaFrameTime(); //calculate time per frame, use delta value if things need to stay constant
         handleHardInputs();     //always check these inputs
 
+        //if search has Started, run the search based on draw speed
         if(search.hasSearchStarted()){
             int drawSpeed = speed + (int)addionalSpeed;
             for (int i = 0; i < (int)(drawSpeed); i++) {
-                if (search.searchNotFinished()) {
+                if (search.hasSearchStarted() && search.searchNotFinished()) {
                     search.updateNextStep();
                 }
             }
@@ -67,13 +76,16 @@ void Graphics::run() {
             handleSoftInputs(); //these are blocked while a search is happening
         }
 
+        // clear back color to black
         glClearColor(0.0f,0.0f,0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        //draw the grid
         myShader->use();
         glBindVertexArray(VAO);
         drawGrid();        
 
+        //swap front and back buffers and poll for events
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -83,20 +95,21 @@ void Graphics::run() {
 //                      Private helper func
 //---------------------------------------------------------------------
 
+//creates a window and sets it as the opengl context
 bool Graphics::createWindow() {
     if (glfwInit() != GLFW_TRUE) return false;
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing
+    glfwWindowHint(GLFW_SAMPLES, 2); // 2x antialiasing
 
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    //window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "PathFinder", glfwGetPrimaryMonitor(), nullptr);
-    window = glfwCreateWindow(windowWidth, windowHeight, "PathFinder", nullptr, nullptr);
+    //window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "PathFinder", glfwGetPrimaryMonitor(), nullptr); //full screen window 
+    window = glfwCreateWindow(windowWidth, windowHeight, "PathFinder", nullptr, nullptr); //window with a fixed initial width
     if (window == nullptr) {
         glfwTerminate();
         return false;
@@ -109,6 +122,7 @@ bool Graphics::createWindow() {
 void Graphics::printFPS(){
     currentFPSTime = glfwGetTime() + 0.001;
     FPS += 1;
+
     if (currentFPSTime - lastFPSTime >= 1.0f)
     {
         lastFPSTime = currentFPSTime;
@@ -132,10 +146,12 @@ void Graphics::handleSoftInputs()
     Node* theNode = getNodeUnderMouse();
     if (theNode != nullptr) {
         
+        //erase walls
         if (mouseHandle.doubleClickHoldLeft) {
             theNode->setType(nodeType::WALKABLE);                        
         }
 
+        //draw walls
         else if (mouseHandle.singleClickkHoldLeft) {
             theNode->setType(nodeType::WALL);
             auto neighbors = theNode->getNeighbors();
@@ -148,22 +164,27 @@ void Graphics::handleSoftInputs()
             }
         }
 
+        //create and mvoe around the end node
         else if (mouseHandle.doubleClickHoldRight) {
             theNode->setType(nodeType::END);
             worldMap->updateEndNode(theNode);
         }
+
+        //create and mvoe around the start node
         else if (mouseHandle.singleClickkHoldRight) {
             theNode->setType(nodeType::START);
             worldMap->updateStartNode(theNode);
         }
     }
-
-    if (keyHandle.start) {
+    
+    //start a algorithm
+    if(keyHandle.start){
         worldMap->reset(false);
-        //search.changeAlgorithm(algorithms::ITERATIVE);
-        search.changeAlgorithm(algorithms::A_STAR);
+        search.changeAlgorithm(algoArray[currSearchAlgo]);
         search.setupSearch();
-        keyHandle.start = false;
+        if (search.hasSearchStarted()) {
+            std::cout << "Running algorithm: " << algoArray[currSearchAlgo] << std::endl;
+        }
     }
 }
 
@@ -176,11 +197,17 @@ void Graphics::handleHardInputs()
         search.resetSearch();
         worldMap->reset(true);
     }else if (keyHandle.key_up) {
-        addionalSpeed += 0.2f;
+        keyHandle.key_up = false;
+        addionalSpeed += 1.0f;
         std::cout << "Addional Draw speed: " <<addionalSpeed << std::endl;
     }else if (keyHandle.key_down) {
-        addionalSpeed = max(addionalSpeed - 0.2f, 0.0f);
+        keyHandle.key_down = false;
+        addionalSpeed = max(addionalSpeed - 1.0f, 0.0f);
         std::cout << "Addional Draw speed: " << addionalSpeed << std::endl;
+    }else if (keyHandle.algo_change) {
+        keyHandle.algo_change = false;
+        currSearchAlgo = (currSearchAlgo + 1) % NUM_OF_ALGORITHMS;
+        std::cout << "Algorithm: " << algoArray[currSearchAlgo] << std::endl;
     }
 }
 
@@ -200,6 +227,7 @@ void Graphics::SetCallbackFunctions(){
 //                      Define draw functions
 //---------------------------------------------------------------------
 
+//draws the grid, colors the nodes based on thier types
 void Graphics::drawGrid()
 {
     int mapW = worldMap->getWidth();
@@ -227,6 +255,7 @@ void Graphics::drawGrid()
     }
 }
 
+//draws a single node
 void Graphics::drawNode(float posX, float posY, float tileSizeX, float tileSizeY, Node* currNode)
 {
     //draw a black box first, this is will look like an outline when the smaller box covers it
@@ -237,7 +266,7 @@ void Graphics::drawNode(float posX, float posY, float tileSizeX, float tileSizeY
     float halfTileY = tileSizeY / 2;
 
     model = glm::translate(model, glm::vec3(posX + (halfTileX), posY-(halfTileY), 0.0f)); // do another scale, make it 5% smaller, this will show the black outline
-    model = glm::scale(model, glm::vec3(0.95f* (halfTileX), 0.95f* (halfTileY), 1.0f));
+    model = glm::scale(model, glm::vec3(0.90f* (halfTileX), 0.90f* (halfTileY), 1.0f));
     myShader->setMat4("model", model);
 
     //color the node based on its type
@@ -252,6 +281,9 @@ void Graphics::drawNode(float posX, float posY, float tileSizeX, float tileSizeY
     case nodeType::VISITED:
         nodeCol = glm::vec3(0.8f, 0.85f, 0.2f);
         break;
+    case nodeType::PATH:
+        nodeCol = glm::vec3(1.0f, 1.0f, 1.0f);
+        break;
     case nodeType::START:
         nodeCol = glm::vec3(0.0f, 0.2f, 0.2f);
         break;
@@ -263,6 +295,8 @@ void Graphics::drawNode(float posX, float posY, float tileSizeX, float tileSizeY
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
+//gets the current node under the mouse pointer
+//note: for large ammounts of nodes, there is a lag between the node under the mouse vs whats visually seen
 Node* Graphics::getNodeUnderMouse(){
     int win_width, win_height;
     glfwGetWindowSize(window, &win_width, &win_height);
@@ -275,7 +309,7 @@ Node* Graphics::getNodeUnderMouse(){
     int nodePixelHeight = win_height / worldMap->getHeight();
 
     //note: for large grid sizes (over million nodes), theres some index out bounds errors
-    //when using int, so just use size_t. Its too slow on a million+ nodes to do anything anyways
+    //when using int, so just use size_t. Its too slow on a million+ nodes to do anything anyways :/
     size_t colIndex = size_t(floor(mouseHandle.mouseX / nodePixelWidth));
     size_t rowIndex = size_t(floor(mouseHandle.mouseY / nodePixelHeight));
 

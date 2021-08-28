@@ -11,6 +11,7 @@
 
 #include "../getDir.h"
 
+//a class to compile and use shader program
 class Shader{
 	public:
 		GLuint ID;

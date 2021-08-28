@@ -21,8 +21,9 @@ const float squareVertices[] = {
 		   -1.0f, -1.0f,
 };
 
-class Graphics
-{
+// a class to handle the display graphics, as well as handle user inputs
+
+class Graphics{
 public:
 	int windowWidth;
 	int windowHeight;
@@ -39,6 +40,7 @@ private:
 	Map* worldMap;
 	Shader* myShader;
 	SearchAlgorithm search;
+	int currSearchAlgo;
 
 	MouseHandler mouseHandle;
 	KeyHandler keyHandle;

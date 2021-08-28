@@ -17,6 +17,7 @@ char defaultMap[DEFAULT_WIDTH][DEFAULT_HEIGHT] = {
 	{ 'X','X','X','X','X','X','X','X','X','X' }
 	};
 
+//creates a default map of nodes
 Map::Map()
 {
 	this->width = DEFAULT_WIDTH;
@@ -54,8 +55,11 @@ Map::Map()
 	}
 }
 
+//creates a custum map with just walkable nodes
 Map::Map(int width, int height)
 {
+	if (width > 100) width = 100;
+	if (height > 100) height = 100;
 	this->width = width;
 	this->height = height;
 	currStartNode = nullptr;
@@ -74,19 +78,47 @@ Map::Map(int width, int height)
 	}
 }
 
+// resets the g,h and f values in all nodes to maximum float
+void Map::resetNodes() {
+	for (int r = 0; r < height; r++) {
+		for (int c = 0; c < width; c++) {
+			Node* currNode = &myNodes[r][c];
+			currNode->reset();
+		}
+	}
+}
+
+//resets the map overall, 
+//changes all nodes to walkable if hard is passed as true
+// other wise changes visited and path nodes
 void Map::reset(bool hard)
 {
 	for (int r = 0; r < height; r++) {
 		for (int c = 0; c < width; c++) {
 			Node* currNode = &myNodes[r][c];
+			currNode->reset(); //reset search variables
+
 			nodeType type = currNode->getType();
-			if (type == nodeType::VISITED || (hard && type == nodeType::WALL)) {
+			if ((type == nodeType::VISITED) || (type == nodeType::PATH) || (hard && type == nodeType::WALL)) {
 				currNode->setType(nodeType::WALKABLE);
 			}
 		}
 	}
 }
 
+//follow the parent nodes set to color the path from endnode to startnode
+void Map::colorPath() {
+	colorParent(currEndNode);
+}
+
+void Map::colorParent(Node* curr) {
+	if (curr->getType() != nodeType::END && curr->getType() != nodeType::START) {
+		curr->setType(nodeType::PATH);
+	}
+	if (curr->parent != nullptr) colorParent(curr->parent);
+}
+
+//adds the neighbors of the node at position row and col in the Node 2d array
 void Map::addNeighbors(unsigned int row, unsigned int col) {
 	Node* currNode = &myNodes[row][col];
 	
@@ -111,10 +143,6 @@ void Map::printMap() {
 		}
 		std::cout << std::endl;
 	}
-
-	/*for (auto it = std::begin(myNodes[0][0].getNeighbors()); it != std::end(myNodes[0][0].getNeighbors()); ++it) {
-		std::cout << "Neighbor: " << it->x << ", " << it->y << "\n";
-	}*/
 }
 
 int Map::getWidth() const {
@@ -139,6 +167,8 @@ Node** Map::getNodes() {
 	return myNodes;
 }
 
+
+// updates the start node of the map, removes the previous one if it succeeded
 void Map::updateStartNode(Node* node)
 {
 	if (node != nullptr && node->getType() == nodeType::START) {
@@ -147,6 +177,7 @@ void Map::updateStartNode(Node* node)
 	}
 }
 
+//upadates the end node of the map, removes the previous one if it suceeded
 void Map::updateEndNode(Node* node)
 {
 	if (node != nullptr && node->getType() == nodeType::END) {

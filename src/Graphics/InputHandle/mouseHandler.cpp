@@ -21,7 +21,7 @@ void MouseHandler::mouse_pos_callback(GLFWwindow* window, double xpos, double yp
 }
 
 void MouseHandler::mouse_btn_press_callback(GLFWwindow* window, int button, int action, int mods)
-{
+{	
 	if (action == GLFW_PRESS) {
 		if (firstClickLeft && button == GLFW_MOUSE_BUTTON_LEFT) {
 			lastClickLeft = high_res_clock::now();
@@ -38,20 +38,21 @@ void MouseHandler::mouse_btn_press_callback(GLFWwindow* window, int button, int 
 
 		auto currTime = high_res_clock::now();
 		if (button == GLFW_MOUSE_BUTTON_LEFT) {
+			singleClickkHoldLeft = true;
 			duration ms_double = currTime - lastClickLeft;
 			if (ms_double.count() < DOUBLE_CLICK_SPEED_MS) {
 				doubleClickHoldLeft = true;
+				singleClickkHoldLeft = false;
 			}
-			singleClickkHoldLeft = true;
 			lastClickLeft = currTime;
 		}
-		else if (button == GLFW_MOUSE_BUTTON_RIGHT)
-		{
+		else if (button == GLFW_MOUSE_BUTTON_RIGHT){
+			singleClickkHoldRight = true;
 			duration ms_double = currTime - lastClickRight;
 			if (ms_double.count() < DOUBLE_CLICK_SPEED_MS) {
 				doubleClickHoldRight = true;
+				singleClickkHoldRight = false;
 			}
-			singleClickkHoldRight = true;
 			lastClickRight = currTime;
 		}
 	}

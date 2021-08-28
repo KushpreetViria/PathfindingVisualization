@@ -24,6 +24,8 @@ void KeyHandler::key_press_callback(GLFWwindow* window, int key, int scancode, i
             key_down = true;
         } else if (key == UP) {
             key_up = true;
+        }else if (key == ALGO_CHANGE) {
+            algo_change = true;
         }
     }else if (action == GLFW_RELEASE) {
         if (key == START_KEY) {
@@ -34,6 +36,8 @@ void KeyHandler::key_press_callback(GLFWwindow* window, int key, int scancode, i
             key_down = false;
         } else if (key == UP) {
             key_up = false;
+        }else if (key == ALGO_CHANGE) {
+            algo_change = false;
         }
     }
 }

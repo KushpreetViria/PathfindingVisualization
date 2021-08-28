@@ -14,10 +14,13 @@ private:
 
 	void addNeighbors(unsigned int  row, unsigned int col);
 	bool inRange(int row, int col);
+	void colorParent(Node*); 
 public:
 	Map(); //default
 	Map(int width, int height); //custom
 	void reset(bool hard);
+	void resetNodes();
+	void colorPath();
 
 	int getWidth() const;
 	int getHeight() const;

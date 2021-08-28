@@ -4,9 +4,13 @@
 #include <vector>
 #include <iostream>
 
+// A node class to store information about each node on the grid
+
+// 5 types of nodes possible, only walls are not traversable
 enum class nodeType {
 	WALKABLE,
 	VISITED,
+	PATH,
 	WALL,
 	START,
 	END
@@ -14,16 +18,26 @@ enum class nodeType {
 
 class Node {
 public:
+	//values needed for A* search
+	Node* parent;
+
 	float f;
 	float g;
 	float h;
 
-	Node(int x = 0, int y = 0) :type(nodeType::WALKABLE) {
-		pos = Point(x, y);
-		neighbors.reserve(8); //could have at most 8
+	float dist;
+
+	Node(int x = 0, int y = 0) :type(nodeType::WALKABLE),pos(Point(x,y)),f(FLT_MAX),g(FLT_MAX),h(FLT_MAX),dist(FLT_MAX) {
+		neighbors.reserve(8); //could have at most 8 neighbors
+		parent = nullptr;
+	}
+
+	void reset() {
+		parent = nullptr;
 		f = FLT_MAX;
 		g = FLT_MAX;
 		h = FLT_MAX;
+		dist = FLT_MAX;
 	}
 
 	void addNeighbor(int x, int y) {
@@ -49,10 +63,6 @@ public:
 
 	bool operator ==(const Node& n) const { return this->pos == n.pos; }
 	bool operator !=(const Node& n) const { return this->pos != n.pos; }
-
-	bool operator <(const Node& n) const {
-		return (this->f < n.f) ? true : false;
-	}
 
 	~Node() {}
 

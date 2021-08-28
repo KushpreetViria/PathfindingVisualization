@@ -5,7 +5,11 @@
 #include <string>
 #include <chrono>
 
-constexpr auto DOUBLE_CLICK_SPEED_MS = 300;
+constexpr auto DOUBLE_CLICK_SPEED_MS = 500;
+
+//----------------------------------------
+// a class to handles state of mouse input
+//----------------------------------------
 
 class MouseHandler {
 public:

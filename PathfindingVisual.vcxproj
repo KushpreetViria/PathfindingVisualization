@@ -100,6 +100,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Logic\Search_Algorithm\Dijkstra.cpp" />
     <ClCompile Include="src\Logic\Search_Algorithm\IterativeSearch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
@@ -123,7 +124,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Logic\Search_Algorithm\ASearch.h" />
+    <ClInclude Include="src\Logic\Search_Algorithm\Dijkstra.h" />
     <ClInclude Include="src\Logic\Search_Algorithm\IterativeSearch.h" />
+    <ClInclude Include="src\Logic\Search_Algorithm\pq.h" />
     <ClInclude Include="src\Logic\Search_Algorithm\Search.h" />
     <ClInclude Include="src\Logic\Search_Algorithm\SearchAlgorithm.h" />
     <ClInclude Include="src\getDir.h" />

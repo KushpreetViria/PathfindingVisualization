@@ -2,3 +2,4 @@
 // such as names of functions and macros.
 // For more information see https://go.microsoft.com/fwlink/?linkid=865984
 #define stderr (__acrt_iob_func(2))
+#define FLT_MAX

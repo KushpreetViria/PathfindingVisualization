@@ -48,6 +48,9 @@
     <ClCompile Include="src\Logic\Search_Algorithm\ASearch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Logic\Search_Algorithm\Dijkstra.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Pre_Compiled\pch.h">
@@ -87,6 +90,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Logic\Search_Algorithm\ASearch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Logic\Search_Algorithm\Dijkstra.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Logic\Search_Algorithm\pq.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

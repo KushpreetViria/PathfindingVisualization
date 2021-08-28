@@ -1,5 +1,7 @@
 #pragma once
 
+// A class to hold 2d points
+
 class Point {
 public:
     int x, y;

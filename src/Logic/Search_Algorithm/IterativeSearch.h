@@ -2,6 +2,8 @@
 #include <stack>
 #include "Search.h"
 
+//searches iteratively, 
+//actually recursively searches neighbor by neighbor
 class IterativeSearch : public Search {
 public:
 	IterativeSearch(Map* map);
@@ -10,5 +12,6 @@ public:
 	bool isNotFinished();
 	void reset();
 private:
-	std::stack<Node*, std::vector<Node*> > stack;
+	bool contains(const Node*);
+	std::vector<Node*> stack;
 };
