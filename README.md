@@ -7,7 +7,7 @@ Key controls:
 - A key - Change algorithm
 - S key - Run the algorithm
 - R key - Reset grid
-- Up and Down arrow keys - Speed up or slow down algorithm search speed
+- Up and Down arrow keys - Speed up or slow down algorithm animation speed
 
 Mouse controls:
 - Mouse left click - Crate walls
